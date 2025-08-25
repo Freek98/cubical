@@ -95,14 +95,14 @@ module _ {ℓ₀ ℓ₁}
 {-
   Images of subsets.
   The universe level of domain and codomain is equal, so we can use
-  the notion of powerset ℙ - so subsets of a type A : Type ℓ, are
+  the notion of powerset ℙ with the same level ℓ - so subsets of a type A : Type ℓ, are
   maps A → hProp ℓ.
 -}
 module _ {A B : Type ℓ} (f : A → B) where
-  isInSubsetImage : ℙ A → B → Type _
+  isInSubsetImage : ℙ A ℓ → B → Type _
   isInSubsetImage U y = ∃[ x ∈ A ] (x ∈ U) × (f x ≡ y)
 
-  SubsetImage : ℙ A → ℙ B
+  SubsetImage : ℙ A ℓ → ℙ B ℓ
   SubsetImage U y = isInSubsetImage U y , isPropPropTrunc
 
 {-

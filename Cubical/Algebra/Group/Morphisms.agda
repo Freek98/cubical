@@ -71,7 +71,8 @@ open GroupStr
 
 private
   variable
-    G H : Group ℓ
+    G : Group ℓ
+    H : Group ℓ'
 
 isInIm : GroupHom G H → ⟨ H ⟩ → Type _
 isInIm {G = G} ϕ h = ∃[ g ∈ ⟨ G ⟩ ] ϕ .fst g ≡ h

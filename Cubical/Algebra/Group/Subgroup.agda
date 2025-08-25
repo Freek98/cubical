@@ -24,7 +24,7 @@ open import Cubical.Algebra.Group.MorphismProperties
 
 private
   variable
-    ℓ : Level
+    ℓ ℓ' : Level
 
 -- We assume an ambient group
 module _ (G' : Group ℓ) where
@@ -32,7 +32,7 @@ module _ (G' : Group ℓ) where
   open GroupStr (snd G')
   private G = ⟨ G' ⟩
 
-  record isSubgroup (H : ℙ G) : Type ℓ where
+  record isSubgroup (H : ℙ G ℓ') : Type (ℓ-max ℓ ℓ') where
     field
       id-closed  : (1g ∈ H)
       op-closed  : {x y : G} → x ∈ H → y ∈ H → x · y ∈ H
@@ -40,10 +40,10 @@ module _ (G' : Group ℓ) where
 
   open isSubgroup
 
-  Subgroup : Type (ℓ-suc ℓ)
-  Subgroup = Σ[ H ∈ ℙ G ] isSubgroup H
+  Subgroup : {ℓ' : Level} → Type (ℓ-max ℓ (ℓ-suc ℓ'))
+  Subgroup {ℓ' = ℓ'} = Σ[ H ∈ ℙ G ℓ' ] isSubgroup H
 
-  isPropIsSubgroup : (H : ℙ G) → isProp (isSubgroup H)
+  isPropIsSubgroup : (H : ℙ G ℓ') → isProp (isSubgroup H)
   id-closed (isPropIsSubgroup H h1 h2 i) =
     ∈-isProp H 1g (h1 .id-closed) (h2 .id-closed) i
   op-closed (isPropIsSubgroup H h1 h2 i) Hx Hy =
@@ -51,10 +51,10 @@ module _ (G' : Group ℓ) where
   inv-closed (isPropIsSubgroup H h1 h2 i) Hx =
     ∈-isProp H _ (h1 .inv-closed Hx) (h2 .inv-closed Hx) i
 
-  isSetSubgroup : isSet Subgroup
+  isSetSubgroup : isSet (Subgroup {ℓ'})
   isSetSubgroup = isSetΣ isSetℙ λ x → isProp→isSet (isPropIsSubgroup x)
 
-  Subgroup→Group : Subgroup → Group ℓ
+  Subgroup→Group : Subgroup {ℓ'} → Group _
   Subgroup→Group (H , Hh) = makeGroup-right 1HG _·HG_ invHG isSetHG assocHG ridHG invrHG
     where
     HG = Σ[ x ∈ G ] ⟨ H x ⟩
@@ -79,7 +79,7 @@ module _ (G' : Group ℓ) where
     invrHG : (x : HG) → x ·HG invHG x ≡ 1HG
     invrHG (x , Hx) = ΣPathP (·InvR x , isProp→PathP (λ i → H (·InvR x i) .snd) _ _)
 
-⟪_⟫ : {G' : Group ℓ} → Subgroup G' → ℙ (G' .fst)
+⟪_⟫ : {G' : Group ℓ} → Subgroup G' → ℙ (G' .fst) ℓ'
 ⟪ H , _ ⟫ = H
 
 module _ {G' : Group ℓ} where
@@ -89,7 +89,7 @@ module _ {G' : Group ℓ} where
   open GroupTheory G'
   private G = ⟨ G' ⟩
 
-  isNormal : Subgroup G' → Type ℓ
+  isNormal : Subgroup G' → Type _
   isNormal H = (g h : G) → h ∈ ⟪ H ⟫ → g · h · inv g ∈ ⟪ H ⟫
 
   isPropIsNormal : (H : Subgroup G') → isProp (isNormal H)
@@ -111,7 +111,7 @@ module _ {G' : Group ℓ} where
   -- Examples of subgroups
 
   -- We can view all of G as a subset of itself
-  groupSubset : ℙ G
+  groupSubset : ℙ G _
   groupSubset x = (x ≡ x) , is-set x x
 
   isSubgroupGroup : isSubgroup G' groupSubset
@@ -123,7 +123,7 @@ module _ {G' : Group ℓ} where
   groupSubgroup = groupSubset , isSubgroupGroup
 
   -- The trivial subgroup
-  trivialSubset : ℙ G
+  trivialSubset : ℙ G _
   trivialSubset x = (x ≡ 1g) , is-set x 1g
 
   isSubgroupTrivialGroup : isSubgroup G' trivialSubset
@@ -146,7 +146,7 @@ NormalSubgroup G = Σ[ G ∈ Subgroup G ] isNormal G
 
 
 -- Can one get this to work with different universes for G and H?
-module _ {G H : Group ℓ} (ϕ : GroupHom G H) where
+module _ {G : Group ℓ} {H : Group ℓ'} (ϕ : GroupHom G H) where
 
   open isSubgroup
   open GroupTheory
@@ -157,7 +157,7 @@ module _ {G H : Group ℓ} (ϕ : GroupHom G H) where
     f = ϕ .fst
     module ϕ = IsGroupHom (ϕ .snd)
 
-  imSubset : ℙ ⟨ H ⟩
+  imSubset : ℙ ⟨ H ⟩ _
   imSubset x = isInIm ϕ x , isPropIsInIm ϕ x
 
   isSubgroupIm : isSubgroup H imSubset
@@ -169,7 +169,7 @@ module _ {G H : Group ℓ} (ϕ : GroupHom G H) where
   imSubgroup : Subgroup H
   imSubgroup = imSubset , isSubgroupIm
 
-  imGroup : Group ℓ
+  imGroup : Group _
   imGroup = Subgroup→Group _ imSubgroup
 
   isNormalIm : ((x y : ⟨ H ⟩) → x H.· y ≡ y H.· x)
@@ -189,7 +189,7 @@ module _ {G H : Group ℓ} (ϕ : GroupHom G H) where
   fst (imNormalSubgroup _) = imSubgroup
   snd (imNormalSubgroup comm) = isNormalIm comm
 
-  kerSubset : ℙ ⟨ G ⟩
+  kerSubset : ℙ ⟨ G ⟩ ℓ'
   kerSubset x = isInKer ϕ x , isPropIsInKer ϕ x
 
   isSubgroupKer : isSubgroup G kerSubset

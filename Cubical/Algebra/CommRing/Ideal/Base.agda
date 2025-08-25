@@ -31,7 +31,7 @@ open import Cubical.Tactics.CommRingSolver
 
 private
   variable
-    ℓ : Level
+    ℓ ℓ' : Level
 
 module CommIdeal (R' : CommRing ℓ) where
   private R = fst R'
@@ -118,7 +118,7 @@ module _ {R : CommRing ℓ} where
   open isIdeal
   open CommIdeal R
   open isCommIdeal
-  makeIdeal : (I : fst R → hProp ℓ)
+  makeIdeal : (I : fst R → hProp ℓ')
               → (+-closed : {x y : fst R} → x ∈p I → y ∈p I → (x + y) ∈p I)
               → (0r-closed : 0r ∈p I)
               → (·-closedLeft : {x : fst R} → (r : fst R) → x ∈p I → r · x ∈p I)

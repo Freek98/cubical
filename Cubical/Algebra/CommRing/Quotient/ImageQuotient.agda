@@ -15,14 +15,14 @@ open RingTheory
 import Cubical.HITs.SetQuotients as SQ
 import Cubical.Algebra.CommRing.Quotient as CQ
 
-module _ {ℓ : Level} (R : CommRing ℓ) {X : Type ℓ} (f : X → ⟨ R ⟩) where
+module _ {ℓ ℓ' : Level} (R : CommRing ℓ) {X : Type ℓ'} (f : X → ⟨ R ⟩) where
   module _ where
     open CommRingStr ⦃...⦄
     open CQ
     instance
      _ = str R
 
-    data generatedIdeal : ⟨ R ⟩ → Type ℓ where
+    data generatedIdeal : ⟨ R ⟩ → Type (ℓ-max ℓ ℓ') where
       single : ∀ x → generatedIdeal (f x)
       zero   : generatedIdeal 0r
       add    : ∀ {x y} → generatedIdeal x → generatedIdeal y →

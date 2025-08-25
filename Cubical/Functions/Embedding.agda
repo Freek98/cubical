@@ -225,10 +225,10 @@ Embedding-into-isSet→isSet = Embedding-into-hLevel→hLevel 1
 
 -- We now show that the powerset is the subtype classifier
 -- i.e. ℙ X ≃ Σ[A ∈ Type ℓ] (A ↪ X)
-Embedding→Subset : {X : Type ℓ} → Σ[ A ∈ Type ℓ ] (A ↪ X) → ℙ X
+Embedding→Subset : {X : Type ℓ} → Σ[ A ∈ Type ℓ' ] (A ↪ X) → ℙ X (ℓ-max ℓ ℓ')
 Embedding→Subset (_ , f , isEmbeddingF) x = fiber f x , isEmbedding→hasPropFibers isEmbeddingF x
 
-Subset→Embedding : {X : Type ℓ} → ℙ X → Σ[ A ∈ Type ℓ ] (A ↪ X)
+Subset→Embedding : {X : Type ℓ} → ℙ X ℓ' → Σ[ A ∈ Type (ℓ-max ℓ ℓ') ] (A ↪ X)
 Subset→Embedding {X = X} A = D , fst , Ψ
  where
   D = Σ[ x ∈ X ] x ∈ A
@@ -236,18 +236,18 @@ Subset→Embedding {X = X} A = D , fst , Ψ
   Ψ : isEmbedding fst
   Ψ w x = isEmbeddingFstΣProp (∈-isProp A)
 
-Subset→Embedding→Subset : {X : Type ℓ} → section (Embedding→Subset {ℓ} {X}) (Subset→Embedding {ℓ} {X})
-Subset→Embedding→Subset _ = funExt λ x → Σ≡Prop (λ _ → isPropIsProp) (ua (FiberIso.fiberEquiv _ x))
+Subset→Embedding→Subset : {X : Type ℓ} → section (Embedding→Subset {X = X}) (Subset→Embedding {X = X})
+Subset→Embedding→Subset {ℓ = ℓ} _ = funExt λ x → Σ≡Prop (λ _ → isPropIsProp) (ua {ℓ = ℓ} (FiberIso.fiberEquiv _ x))
 
-Embedding→Subset→Embedding : {X : Type ℓ} → retract (Embedding→Subset {ℓ} {X}) (Subset→Embedding {ℓ} {X})
+Embedding→Subset→Embedding : {X : Type ℓ} → retract (Embedding→Subset {X = X }) (Subset→Embedding {X = X})
 Embedding→Subset→Embedding {ℓ = ℓ} {X = X} (A , f , ψ) =
   cong (equivFun Σ-assoc-≃) (Σ≡Prop (λ _ → isPropIsEmbedding) (retEq (fibrationEquiv X ℓ) (A , f)))
 
-Subset≃Embedding : {X : Type ℓ} → ℙ X ≃ (Σ[ A ∈ Type ℓ ] (A ↪ X))
+Subset≃Embedding : {X : Type ℓ} → ℙ X ℓ ≃ (Σ[ A ∈ Type ℓ ] (A ↪ X))
 Subset≃Embedding = isoToEquiv (iso Subset→Embedding Embedding→Subset
                                     Embedding→Subset→Embedding Subset→Embedding→Subset)
 
-Subset≡Embedding : {X : Type ℓ} → ℙ X ≡ (Σ[ A ∈ Type ℓ ] (A ↪ X))
+Subset≡Embedding : {X : Type ℓ} → ℙ X ℓ ≡ (Σ[ A ∈ Type ℓ ] (A ↪ X))
 Subset≡Embedding = ua Subset≃Embedding
 
 isEmbedding-∘ : isEmbedding f → isEmbedding h → isEmbedding (f ∘ h)
@@ -443,10 +443,10 @@ isSetEmbedding M N
                (isPropΠ2  λ b _ → isEmbedding→hasPropFibers (M .snd .snd) b))
 
 -- Cantor's theorem for sets
-Set-Embedding-into-Powerset : {A : Type ℓ} → isSet A → A ↪ ℙ A
-Set-Embedding-into-Powerset {A = A} setA
+Set-Embedding-into-Powerset : {A : Type ℓ} → isSet A → A ↪ ℙ A ℓ
+Set-Embedding-into-Powerset {ℓ = ℓ} {A = A} setA
   = fun , (injEmbedding isSetℙ (λ y → sym (H₃ (H₂ y))))
-  where fun : A → ℙ A
+  where fun : A → ℙ A ℓ
         fun a b = (a ≡ b) , (setA a b)
 
         H₂ : {a b : A} → fun a ≡ fun b → a ∈ (fun b)

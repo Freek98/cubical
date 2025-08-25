@@ -239,7 +239,7 @@ enumElim P k p h f i =
 ++FinElim {P = P} {n = ℕsuc n} U V PUHyp PVHyp (suc i) =
           ++FinElim {P = P} (U ∘ suc) V (λ i → PUHyp (suc i)) PVHyp i
 
-++FinPres∈ : {n m : ℕ} {α : FinVec A n} {β : FinVec A m} (S : ℙ A)
+++FinPres∈ : {n m : ℕ} {α : FinVec A n} {β : FinVec A m} (S : ℙ A ℓ')
            → (∀ i → α i ∈ S) → (∀ i → β i ∈ S) → ∀ i → (α ++Fin β) i ∈ S
 ++FinPres∈ {n = ℕzero} S hα hβ i = hβ i
 ++FinPres∈ {n = ℕsuc n} S hα hβ zero = hα zero
